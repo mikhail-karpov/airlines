@@ -8,3 +8,9 @@ services:
       SPRING_PROFILES_ACTIVE: demo
     ports:
       - '8080:8080'
+
+  flight-service:
+    build: ./flight-service
+    container_name: flight-service
+    ports:
+      - '8081:8080'
