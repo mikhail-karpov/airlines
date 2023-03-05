@@ -24,8 +24,13 @@ services:
     build: ./simulator
     container_name: simulator
     environment:
-      SPRING_PROFILES_ACTIVE: demo
       AIRPORT_SERVICE: http://api-gateway:8080
       FLIGHT_SERVICE: http://api-gateway:8080
+      REDIS_HOST: redis
     depends_on:
       - api-gateway
+      - redis
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis
