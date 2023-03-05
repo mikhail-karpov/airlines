@@ -2,3 +2,4 @@ rootProject.name = 'airlines'
 
 include 'airport-service'
 include 'flight-service'
+include 'simulator'

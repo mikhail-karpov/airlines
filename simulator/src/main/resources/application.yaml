@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: simulator
+  main:
+    banner-mode: off
+
+api:
+  airport-service:
+    url: ${AIRPORT_SERVICE:http://localhost:8080}
+  flight-service:
+    url: ${FLIGHT_SERVICE:http://localhost:8080}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
+        loggerLevel: full
+
+logging:
+  level:
+    com.mikhailkarpov: debug
