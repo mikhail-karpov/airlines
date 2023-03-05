@@ -1,4 +1,4 @@
-package com.mikhailkarpov.flights.api.airplane;
+package com.mikhailkarpov.airplane;
 
 import com.mikhailkarpov.flights.api.FlightService;
 import com.mikhailkarpov.flights.api.FlightStatus;

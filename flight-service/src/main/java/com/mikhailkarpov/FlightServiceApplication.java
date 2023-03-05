@@ -1,4 +1,4 @@
-package com.mikhailkarpov.flights;
+package com.mikhailkarpov;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

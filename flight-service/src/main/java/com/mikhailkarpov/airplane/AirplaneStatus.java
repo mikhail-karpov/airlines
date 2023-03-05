@@ -1,4 +1,4 @@
-package com.mikhailkarpov.flights.api.airplane;
+package com.mikhailkarpov.airplane;
 
 public enum AirplaneStatus {
 

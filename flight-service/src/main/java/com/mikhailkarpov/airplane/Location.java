@@ -1,4 +1,4 @@
-package com.mikhailkarpov.flights.api.airplane;
+package com.mikhailkarpov.airplane;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
