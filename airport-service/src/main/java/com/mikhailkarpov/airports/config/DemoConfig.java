@@ -21,7 +21,7 @@ public class DemoConfig {
                     new Airport("MUC", "Munich", new Location(48.35, 11.79)),
                     new Airport("LHR", "London", new Location(51.47, -0.46)),
                     new Airport("JFK", "New York", new Location(40.64, -73.78)),
-                    new Airport("'DEL'", "Dehli", new Location(28.34, 77.06))
+                    new Airport("DEL", "Dehli", new Location(28.34, 77.06))
             ).forEach(airportService::saveAirport);
         };
     }
