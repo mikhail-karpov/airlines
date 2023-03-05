@@ -9,6 +9,7 @@ api:
     url: ${AIRPORT_SERVICE:http://localhost:8080}
   flight-service:
     url: ${FLIGHT_SERVICE:http://localhost:8080}
+    schedule-delay: ${FLIGHT_SCHEDULER_DELAY:15}
 
 feign:
   client:
