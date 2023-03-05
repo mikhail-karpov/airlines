@@ -4,8 +4,15 @@ spring:
   main:
     banner-mode: off
   cloud:
+    function:
+      definition: flights
     stream:
       bindings:
+        flights-in-0:
+          destination: ${FLIGHTS_DESTINATION:flights}
+          group: ${spring.application.name}
+          consumer:
+            max-attempts: 1
         airplanes-out-0:
           destination: ${AIRPLANES_DESTINATION:airplanes}
   kafka:
@@ -19,7 +26,7 @@ api:
   flight-service:
     url: ${FLIGHT_SERVICE:http://localhost:8080}
   airplane-service:
-    schedule-cron: '5 * * * * *'
+    schedule-cron: '2 * * * * *'
 
 feign:
   client:

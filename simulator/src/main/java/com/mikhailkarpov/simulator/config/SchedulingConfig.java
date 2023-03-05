@@ -1,23 +1,24 @@
 package com.mikhailkarpov.simulator.config;
 
 import com.mikhailkarpov.simulator.airplane.AirplaneService;
-import com.mikhailkarpov.simulator.airplane.AirplaneUpdateJob;
-import com.mikhailkarpov.simulator.airport.AirportService;
-import com.mikhailkarpov.simulator.flight.FlightService;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.annotation.Bean;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
+@Slf4j
 @Configuration
 @EnableScheduling
+@RequiredArgsConstructor
 public class SchedulingConfig {
 
-    @Bean
-    AirplaneUpdateJob airplaneUpdateJob(AirplaneService airplaneService,
-                                        AirportService airportService,
-                                        FlightService flightService,
-                                        StreamBridge streamBridge) {
-        return new AirplaneUpdateJob(airportService, airplaneService, flightService, streamBridge);
+    private final AirplaneService airplaneService;
+
+    @Scheduled(cron = "${api.airplane-service.schedule-cron}")
+    public void updateAirplanes() {
+        log.debug("Updating airplanes...");
+        airplaneService.updateAirplanes();
     }
+
 }

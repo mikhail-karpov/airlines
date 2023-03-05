@@ -10,6 +10,8 @@ spring:
       definition: airplanes
     stream:
       bindings:
+        flights-out-0:
+          destination: ${FLIGHTS_DESTINATION:flights}
         airplanes-in-0:
           destination: ${AIRPLANES_DESTINATION:airplanes}
           group: ${spring.application.name}
