@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: api-gateway
+  main:
+    banner-mode: off
+  cloud:
+    gateway:
+      routes:
+        - id: airport-service
+          uri: ${AIRPORT_SERVICE:http://localhost:8080}
+          predicates:
+            - Path=/api/v1/airports/**
+        - id: flight-service
+          uri: ${FLIGHT_SERVICE:http://localhost:8080}
+          predicates:
+            - Path=/api/v1/flights/**
+      httpclient:
+        connect-timeout: 30000
+        response-timeout: 3s

@@ -1,5 +1,6 @@
 rootProject.name = 'airlines'
 
+include 'api-gateway'
 include 'airport-service'
 include 'flight-service'
 include 'simulator'

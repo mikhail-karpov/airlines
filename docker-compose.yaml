@@ -1,27 +1,31 @@
 version: '3.8'
 
 services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      AIRPORT_SERVICE: http://airport-service:8080
+      FLIGHT_SERVICE: http://flight-service:8080
+    ports:
+      - '8080:8080'
+
   airport-service:
     build: ./airport-service
     container_name: airport-service
     environment:
       SPRING_PROFILES_ACTIVE: demo
-    ports:
-      - '8080:8080'
 
   flight-service:
     build: ./flight-service
     container_name: flight-service
-    ports:
-      - '8081:8080'
 
   simulator:
     build: ./simulator
     container_name: simulator
     environment:
       SPRING_PROFILES_ACTIVE: demo
-      AIRPORT_SERVICE: http://airport-service:8080
-      FLIGHT_SERVICE: http://flight-service:8080
+      AIRPORT_SERVICE: http://api-gateway:8080
+      FLIGHT_SERVICE: http://api-gateway:8080
     depends_on:
-      - airport-service
-      - flight-service
+      - api-gateway
