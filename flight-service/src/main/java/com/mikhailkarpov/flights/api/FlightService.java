@@ -8,4 +8,6 @@ public interface FlightService {
 
     Optional<Flight> findFlightByCode(String code);
 
+    void updateFlight(String code, FlightStatus status);
+
 }

@@ -1,6 +1,7 @@
 package com.mikhailkarpov.simulator.airplane;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisHash;
@@ -11,6 +12,7 @@ import java.util.Objects;
 @RedisHash("airplanes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Slf4j
 public class Airplane {
 
     @Id
@@ -21,6 +23,7 @@ public class Airplane {
     private Point location;
     private AirplaneStatus status;
     private double speed;
+    private Instant createdAt;
     private Instant updatedAt;
 
     @Builder
@@ -29,29 +32,31 @@ public class Airplane {
         this.origin = origin;
         this.destination = destination;
         this.location = origin;
-        this.status = AirplaneStatus.ON_GROUND;
-        this.updatedAt = Instant.now();
+        this.status = AirplaneStatus.LANDED;
+        this.createdAt = Instant.now();
+        this.updatedAt = createdAt;
         setSpeed(speed);
     }
 
     public void takeOff() {
-        checkStatus(AirplaneStatus.ON_GROUND);
+        checkStatus(AirplaneStatus.LANDED);
         this.status = AirplaneStatus.IN_FLIGHT;
         this.updatedAt = Instant.now();
+        log.debug("Took off: {}", this);
     }
 
     public void fly() {
         checkStatus(AirplaneStatus.IN_FLIGHT);
-        Instant now = Instant.now();
-        long timeElapsed = now.toEpochMilli() - updatedAt.toEpochMilli();
         this.updatedAt = Instant.now();
+        log.debug("Flying {}", this);
     }
 
     public void land() {
         checkStatus(AirplaneStatus.IN_FLIGHT);
-        this.status = AirplaneStatus.ON_GROUND;
+        this.status = AirplaneStatus.LANDED;
         this.location = destination;
         this.updatedAt = Instant.now();
+        log.debug("Landing {}", this);
     }
 
     private void setSpeed(double speed) {

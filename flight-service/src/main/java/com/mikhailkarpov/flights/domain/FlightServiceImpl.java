@@ -48,6 +48,16 @@ public class FlightServiceImpl implements FlightService {
         return flightRepository.findFlightByCode(code);
     }
 
+    @Override
+    @Transactional
+    public void updateFlight(@NonNull String code, @NonNull FlightStatus status) {
+
+        flightRepository.findByCode(code).ifPresent(flight -> {
+            flight.updateStatus(status);
+            log.debug("Updating flight: {}", flight);
+        });
+    }
+
     private static Flight mapEntityToDto(FlightEntity entity) {
         return Flight.builder()
                 .code(entity.getCode())

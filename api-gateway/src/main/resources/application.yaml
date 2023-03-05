@@ -10,6 +10,10 @@ spring:
           uri: ${AIRPORT_SERVICE:http://localhost:8080}
           predicates:
             - Path=/api/v1/airports/**
+        - id: airplane-service
+          uri: ${AIRPLANE_SERVICE:http://localhost:8080}
+          predicates:
+            - Path=/api/v1/airplanes/**
         - id: flight-service
           uri: ${FLIGHT_SERVICE:http://localhost:8080}
           predicates:
@@ -17,3 +21,6 @@ spring:
       httpclient:
         connect-timeout: 30000
         response-timeout: 3s
+logging:
+  level:
+    root: warn

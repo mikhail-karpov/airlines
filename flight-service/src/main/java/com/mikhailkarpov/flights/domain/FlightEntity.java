@@ -40,6 +40,10 @@ public class FlightEntity {
         this.status = status;
     }
 
+    public void updateStatus(@NonNull FlightStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

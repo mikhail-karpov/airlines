@@ -3,6 +3,13 @@ spring:
     name: simulator
   main:
     banner-mode: off
+  cloud:
+    stream:
+      bindings:
+        airplanes-out-0:
+          destination: ${AIRPLANES_DESTINATION:airplanes}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
@@ -11,7 +18,8 @@ api:
     url: ${AIRPORT_SERVICE:http://localhost:8080}
   flight-service:
     url: ${FLIGHT_SERVICE:http://localhost:8080}
-    schedule-cron: '15 * * * * *'
+  airplane-service:
+    schedule-cron: '5 * * * * *'
 
 feign:
   client:
@@ -23,4 +31,5 @@ feign:
 
 logging:
   level:
+    root: warn
     com.mikhailkarpov: debug

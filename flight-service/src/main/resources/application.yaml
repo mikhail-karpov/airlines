@@ -5,6 +5,19 @@ spring:
     banner-mode: off
   jpa:
     open-in-view: false
+  cloud:
+    function:
+      definition: airplanes
+    stream:
+      bindings:
+        airplanes-in-0:
+          destination: ${AIRPLANES_DESTINATION:airplanes}
+          group: ${spring.application.name}
+          consumer:
+            max-attempts: 1
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 logging:
   level:
+    root: warn
     com.mikhailkarpov: debug
