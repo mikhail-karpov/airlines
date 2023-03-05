@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: flight-service
+  main:
+    banner-mode: off
+  jpa:
+    open-in-view: false
+logging:
+  level:
+    com.mikhailkarpov: debug
