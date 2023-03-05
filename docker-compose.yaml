@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  airport-service:
+    build: ./airport-service
+    container_name: airport-service
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+    ports:
+      - '8080:8080'
