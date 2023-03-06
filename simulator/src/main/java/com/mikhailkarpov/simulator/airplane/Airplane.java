@@ -7,6 +7,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @RedisHash("airplanes")
@@ -18,42 +19,44 @@ public class Airplane {
     @Id
     private String flightCode;
 
-    private Point origin;
-    private Point destination;
     private Point location;
+    private Point destination;
     private AirplaneStatus status;
     private double speed;
-    private Instant createdAt;
+    private Instant tookOffAt;
     private Instant updatedAt;
 
     @Builder
-    public Airplane(@NonNull String flightCode, @NonNull Point origin, @NonNull Point destination, double speed) {
+    public Airplane(@NonNull String flightCode, @NonNull Point location, @NonNull Point destination, double speed) {
         this.flightCode = flightCode;
-        this.origin = origin;
         this.destination = destination;
-        this.location = origin;
-        this.status = AirplaneStatus.LANDED;
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
+        this.location = location;
+        this.status = AirplaneStatus.READY_FOR_TAKE_OFF;
+        this.updatedAt = Instant.now();
         setSpeed(speed);
     }
 
     public void takeOff() {
-        checkStatus(AirplaneStatus.LANDED);
+        checkStatus(AirplaneStatus.READY_FOR_TAKE_OFF);
         this.status = AirplaneStatus.IN_FLIGHT;
         this.updatedAt = Instant.now();
+        this.tookOffAt = this.updatedAt;
         log.debug("Took off: {}", this);
     }
 
     public void fly() {
         checkStatus(AirplaneStatus.IN_FLIGHT);
         this.updatedAt = Instant.now();
+        if (isFlyingTooLong()) {
+            //TODO real movement
+            this.status = AirplaneStatus.READY_FOR_LANDING;
+        }
         log.debug("Flying {}", this);
     }
 
     public void land() {
-        checkStatus(AirplaneStatus.IN_FLIGHT);
-        this.status = AirplaneStatus.LANDED;
+        checkStatus(AirplaneStatus.READY_FOR_LANDING);
+        this.status = AirplaneStatus.READY_FOR_TAKE_OFF;
         this.location = destination;
         this.updatedAt = Instant.now();
         log.debug("Landing {}", this);
@@ -70,6 +73,13 @@ public class Airplane {
         if (status != requiredStatus) {
             throw new IllegalStateException("Airplane code=" + flightCode + " illegal status: " + status);
         }
+    }
+
+    private boolean isFlyingTooLong() {
+        if (tookOffAt == null) {
+            return false;
+        }
+        return Instant.now().isAfter(tookOffAt.plus(10L, ChronoUnit.SECONDS));
     }
 
     @Override
@@ -91,7 +101,6 @@ public class Airplane {
     public String toString() {
         return "Airplane{" +
                 "flightCode='" + flightCode + '\'' +
-                ", origin=" + origin +
                 ", destination=" + destination +
                 ", location=" + location +
                 ", status=" + status +

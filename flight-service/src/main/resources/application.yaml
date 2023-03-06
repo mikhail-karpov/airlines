@@ -7,16 +7,16 @@ spring:
     open-in-view: false
   cloud:
     function:
-      definition: airplanes
+      definition: airplane
     stream:
       bindings:
-        flights-out-0:
-          destination: ${FLIGHTS_DESTINATION:flights}
-        airplanes-in-0:
+        airplane-in-0:
           destination: ${AIRPLANES_DESTINATION:airplanes}
           group: ${spring.application.name}
           consumer:
             max-attempts: 1
+        airplaneCommand-out-0:
+          destination: ${AIRPLANE_COMMANDS_DESTINATION:flights}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 logging:

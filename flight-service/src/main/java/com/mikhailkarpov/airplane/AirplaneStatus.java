@@ -2,5 +2,5 @@ package com.mikhailkarpov.airplane;
 
 public enum AirplaneStatus {
 
-    TOOK_OFF, IN_FLIGHT, LANDED
+    READY_FOR_TAKE_OFF, IN_FLIGHT, READY_FOR_LANDING
 }

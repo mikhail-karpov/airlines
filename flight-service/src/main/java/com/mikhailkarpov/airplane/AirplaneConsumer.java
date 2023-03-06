@@ -4,18 +4,21 @@ import com.mikhailkarpov.flights.api.FlightService;
 import com.mikhailkarpov.flights.api.FlightStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
 @Slf4j
-@Component("airplanes")
+@Component("airplane")
 public class AirplaneConsumer implements Consumer<Airplane> {
 
     private final FlightService flightService;
+    private final StreamBridge streamBridge;
 
-    public AirplaneConsumer(FlightService flightService) {
+    public AirplaneConsumer(FlightService flightService, StreamBridge streamBridge) {
         this.flightService = flightService;
+        this.streamBridge = streamBridge;
     }
 
     @Override
@@ -28,25 +31,27 @@ public class AirplaneConsumer implements Consumer<Airplane> {
             FlightStatus flightStatus = flight.getStatus();
 
             switch (airplane.getStatus()) {
-                case TOOK_OFF:
+                case IN_FLIGHT:
                     if (flightStatus == FlightStatus.SCHEDULED) {
                         flightService.updateFlight(flightCode, FlightStatus.DEPARTED);
                     }
+                    AirplaneCommand command = new AirplaneCommand(flightCode, AirplaneCommandType.FLY);
+                    log.debug("Sending {}", command);
+                    streamBridge.send("airplaneCommand-out-0", command);
+                    //TODO airplane position notification
                     break;
-                case IN_FLIGHT:
-                    if (flightStatus != FlightStatus.DEPARTED) {
-                        flightService.updateFlight(flightCode, FlightStatus.DEPARTED);
-                    }
-                    //TODO notify location
-                    break;
-                case LANDED:
+                case READY_FOR_LANDING:
                     if (flightStatus != FlightStatus.ARRIVED) {
                         flightService.updateFlight(flightCode, FlightStatus.ARRIVED);
                     }
+                    command = new AirplaneCommand(flightCode, AirplaneCommandType.LAND);
+                    log.debug("Sending {}", command);
+                    streamBridge.send("airplaneCommand-out-0", command);
                     break;
                 default:
                     break;
             }
         });
     }
+
 }

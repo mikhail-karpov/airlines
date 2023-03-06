@@ -13,11 +13,11 @@ import java.time.Instant;
 public class Airplane {
 
     String flightCode;
-    Location origin;
-    Location destination;
     Location location;
+    Location destination;
     AirplaneStatus status;
-    Double speed;
+    double speed;
+    Instant tookOffAt;
     Instant updatedAt;
 
 

@@ -5,15 +5,15 @@ spring:
     banner-mode: off
   cloud:
     function:
-      definition: flights
+      definition: airplaneCommand
     stream:
       bindings:
-        flights-in-0:
-          destination: ${FLIGHTS_DESTINATION:flights}
+        airplaneCommand-in-0:
+          destination: ${AIRPLANE_COMMANDS_DESTINATION:flights}
           group: ${spring.application.name}
           consumer:
             max-attempts: 1
-        airplanes-out-0:
+        airplaneCommand-out-0:
           destination: ${AIRPLANES_DESTINATION:airplanes}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -25,8 +25,6 @@ api:
     url: ${AIRPORT_SERVICE:http://localhost:8080}
   flight-service:
     url: ${FLIGHT_SERVICE:http://localhost:8080}
-  airplane-service:
-    schedule-cron: '2 * * * * *'
 
 feign:
   client:

@@ -2,14 +2,20 @@ package com.mikhailkarpov.simulator.airplane;
 
 import com.mikhailkarpov.simulator.airport.Airport;
 import com.mikhailkarpov.simulator.airport.AirportService;
+import com.mikhailkarpov.simulator.flight.Flight;
 import com.mikhailkarpov.simulator.flight.FlightService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import com.mikhailkarpov.simulator.flight.FlightStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/airplanes")
 public class AirplaneController {
@@ -26,25 +32,33 @@ public class AirplaneController {
         this.flightService = flightService;
     }
 
+    @PostMapping
+    public Airplane createAirplane() {
+        List<Airport> airports = airportService.listAirports();
+        Airport origin = getRandomAirport(airports);
+        Airport destination = getRandomAirport(airports);
+        while (Objects.equals(origin, destination)) {
+            destination = getRandomAirport(airports);
+        }
+
+        Flight flight = flightService.createFlight(origin.getCode(), destination.getCode());
+        log.debug("Created: {}", flight);
+
+        if (flight.getStatus() == FlightStatus.SCHEDULED) {
+            Airplane airplane = airplaneService.createAirplane(flight.getCode(), origin.getLocation(), destination.getLocation());
+            log.debug("Created: {}", airplane);
+            return airplane;
+        } else {
+            throw new IllegalArgumentException("Unexpected status flight: " + flight.getStatus());
+        }
+    }
+
     @GetMapping
     public List<Airplane> listAirplanes() {
 
         return airplaneService.findAllAirplanes();
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void createFlight() {
-        List<Airport> airports = airportService.listAirports();
-        Airport origin = getRandomAirport(airports);
-        Airport destination = getRandomAirport(airports);
-
-        while (Objects.equals(origin, destination)) {
-            destination = getRandomAirport(airports);
-        }
-
-        flightService.createFlight(origin.getCode(), destination.getCode());
-    }
 
     private static Airport getRandomAirport(List<Airport> airports) {
         int originIndex = ThreadLocalRandom.current().nextInt(airports.size());
