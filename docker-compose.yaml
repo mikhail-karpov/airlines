@@ -25,9 +25,9 @@ services:
     depends_on:
       - kafka
 
-  simulator:
-    build: ./simulator
-    container_name: simulator
+  airplane-service:
+    build: ./airplane-service
+    container_name: airplane-service
     environment:
       AIRPORT_SERVICE: http://api-gateway:8080
       FLIGHT_SERVICE: http://api-gateway:8080
