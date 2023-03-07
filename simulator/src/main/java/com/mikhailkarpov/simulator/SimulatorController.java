@@ -1,10 +1,13 @@
-package com.mikhailkarpov.simulator.airplane;
+package com.mikhailkarpov.simulator;
 
+import com.mikhailkarpov.simulator.airplane.Airplane;
+import com.mikhailkarpov.simulator.airplane.AirplaneCommand;
+import com.mikhailkarpov.simulator.airplane.AirplaneCommandType;
+import com.mikhailkarpov.simulator.airplane.AirplaneService;
 import com.mikhailkarpov.simulator.airport.Airport;
 import com.mikhailkarpov.simulator.airport.AirportService;
 import com.mikhailkarpov.simulator.flight.Flight;
 import com.mikhailkarpov.simulator.flight.FlightService;
-import com.mikhailkarpov.simulator.flight.FlightStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,22 +15,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController("airplaneCommand")
 @RequestMapping("/api/v1/airplanes")
-public class AirplaneController implements Function<AirplaneCommand, Airplane> {
+public class SimulatorController implements Function<AirplaneCommand, Airplane> {
 
     private final AirportService airportService;
     private final AirplaneService airplaneService;
     private final FlightService flightService;
 
-    public AirplaneController(AirportService airportService,
-                              AirplaneService airplaneService,
-                              FlightService flightService) {
+    public SimulatorController(AirportService airportService,
+                               AirplaneService airplaneService,
+                               FlightService flightService) {
         this.airportService = airportService;
         this.airplaneService = airplaneService;
         this.flightService = flightService;
@@ -40,7 +45,9 @@ public class AirplaneController implements Function<AirplaneCommand, Airplane> {
         String flightCode = command.getFlightCode();
         AirplaneCommandType commandType = command.getCommandType();
 
-        if (AirplaneCommandType.TAKE_OFF == commandType) {
+        if (AirplaneCommandType.GET_READY == commandType) {
+            return launchAirplane(flightCode);
+        } else if (AirplaneCommandType.TAKE_OFF == commandType) {
             return airplaneService.takeOff(flightCode);
         } else if (AirplaneCommandType.LAND == commandType) {
             return airplaneService.land(flightCode);
@@ -49,8 +56,27 @@ public class AirplaneController implements Function<AirplaneCommand, Airplane> {
         }
     }
 
+    private Airplane launchAirplane(String flightCode) {
+        Flight flight = flightService.getFlight(flightCode);
+
+        Map<String, Airport> airports = airportService.listAirports()
+                .stream()
+                .collect(Collectors.toMap(Airport::getCode, Function.identity()));
+
+        Airport origin = airports.get(flight.getOrigin());
+        Airport destination = airports.get(flight.getDestination());
+        if (origin == null || destination == null) {
+            String errMessage = String.format("Unable to create flight %s -> %s", flight.getOrigin(), flight.getDestination());
+            throw new IllegalArgumentException(errMessage);
+        }
+
+        Airplane airplane = airplaneService.createAirplane(flight.getCode(), origin.getLocation(), destination.getLocation());
+        log.debug("Created: {}", airplane);
+        return airplane;
+    }
+
     @PostMapping
-    public Airplane createAirplane() {
+    public Flight createRandomFlight() {
         List<Airport> airports = airportService.listAirports();
         Airport origin = getRandomAirport(airports);
         Airport destination = getRandomAirport(airports);
@@ -59,15 +85,8 @@ public class AirplaneController implements Function<AirplaneCommand, Airplane> {
         }
 
         Flight flight = flightService.createFlight(origin.getCode(), destination.getCode());
-        log.debug("Created: {}", flight);
-
-        if (flight.getStatus() == FlightStatus.CREATED) {
-            Airplane airplane = airplaneService.createAirplane(flight.getCode(), origin.getLocation(), destination.getLocation());
-            log.debug("Created: {}", airplane);
-            return airplane;
-        } else {
-            throw new IllegalArgumentException("Unexpected status flight: " + flight.getStatus());
-        }
+        log.debug("Created random flight: {}", flight);
+        return flight;
     }
 
     @GetMapping

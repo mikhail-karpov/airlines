@@ -61,7 +61,7 @@ public class FlightDispatcher implements Consumer<Airplane> {
         flightService.listFlights(FlightStatus.CREATED).forEach(flight -> {
             log.debug("Scheduling: {}", flight);
             flightService.updateFlight(flight.getCode(), FlightStatus.SCHEDULED);
-            sendCommand(flight.getCode(), AirplaneCommandType.TAKE_OFF);
+            sendCommand(flight.getCode(), AirplaneCommandType.GET_READY);
         });
     }
 

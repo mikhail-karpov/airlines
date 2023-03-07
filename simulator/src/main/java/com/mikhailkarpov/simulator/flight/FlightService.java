@@ -1,5 +1,6 @@
 package com.mikhailkarpov.simulator.flight;
 
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -21,5 +22,10 @@ public class FlightService {
                 .build();
 
         return flightClient.createFlight(request);
+    }
+
+    public Flight getFlight(@NonNull String flightCode) {
+
+        return flightClient.getFlight(flightCode);
     }
 }
