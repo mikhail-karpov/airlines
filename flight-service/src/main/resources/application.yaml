@@ -19,7 +19,18 @@ spring:
           destination: ${AIRPLANE_COMMANDS_DESTINATION:flights}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+api:
+  airport-service:
+    url: ${AIRPORT_SERVICE:http://localhost:8080}
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
+        loggerLevel: full
 logging:
   level:
     root: warn
-    com.mikhailkarpov: debug
+    org.springframework.web: debug
+    com.mikhailkarpov: info

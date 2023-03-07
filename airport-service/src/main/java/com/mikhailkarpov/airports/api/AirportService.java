@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,6 +31,12 @@ public class AirportService {
                 .build();
 
         airportRepository.save(airportEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Airport> findAirportByCode(@NonNull String code) {
+
+        return airportRepository.findAirportByCode(code);
     }
 
     @Transactional(readOnly = true)

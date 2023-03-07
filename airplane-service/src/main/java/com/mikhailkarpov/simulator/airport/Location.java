@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 
+import java.io.Serializable;
+
 @Value
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @AllArgsConstructor
-public class Location {
+public class Location implements Serializable {
 
     double x, y;
 

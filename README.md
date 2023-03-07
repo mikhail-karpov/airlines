@@ -10,26 +10,12 @@ Microservices architecture simulating air traffic
 - Spring Boot
 - Kafka
 - Redis
+- Thymeleaf
 
-## How to use
+## Running
 
 Build with Gradle and Docker
 ```
 ./gradlew build -x test
 docker compose up --build -d 
-```
-
-Launch an airplane
-```
-curl -X POST http://localhost:8080/api/v1/airplanes
-```
-
-List current airplanes
-```
-curl http://localhost:8080/api/v1/airplanes
-```
-
-Stop
-```
-docker compose down
 ```

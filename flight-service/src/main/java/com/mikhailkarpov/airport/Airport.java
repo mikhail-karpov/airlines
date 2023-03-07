@@ -1,13 +1,11 @@
-package com.mikhailkarpov.airports.api;
+package com.mikhailkarpov.airport;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 @Value
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @AllArgsConstructor
+@Builder
 public class Airport {
 
     String code;

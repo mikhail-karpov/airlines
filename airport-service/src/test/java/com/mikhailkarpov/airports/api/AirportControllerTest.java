@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,7 +25,7 @@ class AirportControllerTest {
     private AirportService airportService;
 
     @Test
-    @DisplayName("Should lis airports")
+    @DisplayName("Should list airports")
     void listAirports() throws Exception {
 
         Mockito.when(airportService.listAirports()).thenReturn(List.of(
@@ -40,4 +41,29 @@ class AirportControllerTest {
                 .andExpect(jsonPath("$[1].location.y").value(-3.5));
     }
 
+    @Test
+    @DisplayName("Should get airport by code")
+    void getAirport() throws Exception {
+
+        Mockito.when(airportService.findAirportByCode("ABC")).thenReturn(Optional.of(
+                new Airport("ABC", "City", new Location(2.0, 3.5))
+        ));
+
+        mockMvc.perform(get("/api/v1/airports/ABC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ABC"))
+                .andExpect(jsonPath("$.city").value("City"))
+                .andExpect(jsonPath("$.location.x").value(2.0))
+                .andExpect(jsonPath("$.location.y").value(3.5));
+    }
+
+    @Test
+    @DisplayName("Should return 404 when airport not found by code")
+    void getAirportNotFound() throws Exception {
+
+        Mockito.when(airportService.findAirportByCode("ABC")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/v1/airports/ABC"))
+                .andExpect(status().isNotFound());
+    }
 }

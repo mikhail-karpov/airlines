@@ -4,6 +4,7 @@ import com.mikhailkarpov.flights.api.exceptions.FlightNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/flights")
@@ -19,6 +20,12 @@ public class FlightController {
     public Flight createFlight(@Valid @RequestBody CreateFlightRequest request) {
 
         return flightService.createFlight(request);
+    }
+
+    @GetMapping
+    public List<Flight> listFlights() {
+
+        return flightService.listFlights();
     }
 
     @GetMapping("/{code}")

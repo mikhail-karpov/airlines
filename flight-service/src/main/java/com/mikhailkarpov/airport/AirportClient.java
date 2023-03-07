@@ -1,4 +1,4 @@
-package com.mikhailkarpov.simulator.airport;
+package com.mikhailkarpov.airport;
 
 import lombok.NonNull;
 import org.springframework.cloud.openfeign.FeignClient;

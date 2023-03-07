@@ -3,6 +3,11 @@ spring:
     name: simulator
   main:
     banner-mode: off
+  cache:
+    type: redis
+    redis:
+      key-prefix: ${spring.application.name}
+      time-to-live: 15m
   cloud:
     function:
       definition: airplaneCommand

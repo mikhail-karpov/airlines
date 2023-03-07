@@ -9,7 +9,8 @@ public interface FlightService {
 
     Optional<Flight> findFlightByCode(String code);
 
+    List<Flight> listFlights();
+
     void updateFlight(String code, FlightStatus status);
 
-    List<Flight> listFlights(FlightStatus status);
 }

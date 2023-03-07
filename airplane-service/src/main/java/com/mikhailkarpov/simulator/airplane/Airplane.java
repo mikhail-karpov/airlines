@@ -1,19 +1,17 @@
 package com.mikhailkarpov.simulator.airplane;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Objects;
 
 @RedisHash("airplanes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Slf4j
 public class Airplane {
 
     @Id
@@ -41,45 +39,49 @@ public class Airplane {
         this.status = AirplaneStatus.IN_FLIGHT;
         this.updatedAt = Instant.now();
         this.tookOffAt = this.updatedAt;
-        log.debug("Took off: {}", this);
     }
 
     public void fly() {
         checkStatus(AirplaneStatus.IN_FLIGHT);
+        updateLocation();
         this.updatedAt = Instant.now();
-        if (isFlyingTooLong()) {
-            //TODO real movement
-            this.status = AirplaneStatus.READY_FOR_LANDING;
-        }
-        log.debug("Flying {}", this);
     }
 
     public void land() {
         checkStatus(AirplaneStatus.READY_FOR_LANDING);
-        this.status = AirplaneStatus.READY_FOR_TAKE_OFF;
+        this.status = AirplaneStatus.LANDED;
         this.location = destination;
         this.updatedAt = Instant.now();
-        log.debug("Landing {}", this);
     }
 
     private void setSpeed(double speed) {
-        if (speed <= 0) {
-            throw new IllegalArgumentException("Speed must be positive");
+        if (speed < 100. || speed > 2000.) {
+            throw new IllegalArgumentException("Speed must be between 100 and 2000 km/h");
         }
         this.speed = speed;
     }
 
-    private void checkStatus(AirplaneStatus requiredStatus) {
-        if (status != requiredStatus) {
+    private void checkStatus(AirplaneStatus... requiredStatus) {
+        if (Arrays.stream(requiredStatus).noneMatch(status -> status == this.status)) {
             throw new IllegalStateException("Airplane code=" + flightCode + " illegal status: " + status);
         }
     }
 
-    private boolean isFlyingTooLong() {
-        if (tookOffAt == null) {
-            return false;
+    private void updateLocation() {
+        double deltaX = destination.getX() - location.getX();
+        double deltaY = destination.getY() - location.getY();
+        double distanceToFly = speed / 36000. * (Instant.now().toEpochMilli() - updatedAt.toEpochMilli());
+        double distanceToDestination = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        if (distanceToFly > distanceToDestination) {
+            location = new Point(destination);
+            status = AirplaneStatus.READY_FOR_LANDING;
+        } else {
+            double direction = Math.atan2(deltaY, deltaX);
+            double x = location.getX() + distanceToFly * Math.cos(direction);
+            double y = location.getY() + distanceToFly * Math.sin(direction);
+            this.location = new Point(x, y);
         }
-        return Instant.now().isAfter(tookOffAt.plus(10L, ChronoUnit.SECONDS));
     }
 
     @Override
@@ -108,4 +110,6 @@ public class Airplane {
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
+
 }

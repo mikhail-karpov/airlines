@@ -1,4 +1,4 @@
-package com.mikhailkarpov.airports.api;
+package com.mikhailkarpov.airport;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,12 @@ import lombok.Value;
 @Value
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @AllArgsConstructor
-public class Airport {
+public class Location {
 
-    String code;
-    String city;
-    Location location;
+    double x, y;
 
+    @Override
+    public String toString() {
+        return String.format("Location{x=%.2f, y=%.2f}", x, y);
+    }
 }

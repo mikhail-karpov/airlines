@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @Slf4j
@@ -30,31 +29,29 @@ public class AirplaneService {
                 .speed(500. + 100. * Math.random())
                 .build();
 
+        log.debug("Creating: {}", airplane);
         return airplaneRepository.save(airplane);
-    }
-
-    public List<Airplane> findAllAirplanes() {
-
-        return airplaneRepository.findAll();
     }
 
     public Airplane takeOff(String flightCode) {
         Airplane airplane = airplaneRepository.findById(flightCode).orElseThrow();
         airplane.takeOff();
+        log.debug("Taking off: {}", airplane);
         return airplaneRepository.save(airplane);
     }
 
     public Airplane fly(String flightCode) {
         Airplane airplane = airplaneRepository.findById(flightCode).orElseThrow();
         airplane.fly();
+        log.trace("Flying {}", airplane);
         return airplaneRepository.save(airplane);
     }
 
     public Airplane land(String flightCode) {
         Airplane airplane = airplaneRepository.findById(flightCode).orElseThrow();
         airplane.land();
-        airplaneRepository.delete(airplane);
-        return airplane;
+        log.debug("Landing: {}", airplane);
+        return airplaneRepository.save(airplane);
     }
 
     private static Point getPoint(Location location) {

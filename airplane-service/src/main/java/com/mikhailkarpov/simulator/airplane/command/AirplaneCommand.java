@@ -1,4 +1,4 @@
-package com.mikhailkarpov.simulator.airplane;
+package com.mikhailkarpov.simulator.airplane.command;
 
 import lombok.*;
 

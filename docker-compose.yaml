@@ -3,40 +3,49 @@ version: '3.8'
 services:
   api-gateway:
     build: ./api-gateway
+    hostname: api-gateway
     container_name: api-gateway
     environment:
       AIRPORT_SERVICE: http://airport-service:8080
-      AIRPLANE_SERVICE: http://simulator:8080
+      AIRPLANE_SERVICE: http://airplane-service:8080
       FLIGHT_SERVICE: http://flight-service:8080
     ports:
       - '8080:8080'
 
   airport-service:
     build: ./airport-service
+    hostname: airport-service
     container_name: airport-service
     environment:
       SPRING_PROFILES_ACTIVE: demo
 
   flight-service:
     build: ./flight-service
+    hostname: flight-service
     container_name: flight-service
     environment:
+      SPRING_PROFILES_ACTIVE: demo
+      AIRPORT_SERVICE: http://airport-service:8080
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - kafka
+    ports:
+      - '8081:8080'
 
   airplane-service:
     build: ./airplane-service
+    hostname: airplane-service
     container_name: airplane-service
     environment:
-      AIRPORT_SERVICE: http://api-gateway:8080
-      FLIGHT_SERVICE: http://api-gateway:8080
+      AIRPORT_SERVICE: http://airport-service:8080
+      FLIGHT_SERVICE: http://flight-service:8080
       REDIS_HOST: redis
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
-      - api-gateway
       - redis
       - kafka
+      - airport-service
+      - flight-service
 
   redis:
     image: redis:6-alpine
@@ -63,4 +72,4 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     ports:
-      - '9092:9092'
+      - '29092:29092'

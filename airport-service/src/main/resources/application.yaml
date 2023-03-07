@@ -9,3 +9,4 @@ logging:
   level:
     root: warn
     com.mikhailkarpov: debug
+

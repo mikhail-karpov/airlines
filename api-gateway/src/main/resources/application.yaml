@@ -18,9 +18,6 @@ spring:
           uri: ${FLIGHT_SERVICE:http://localhost:8080}
           predicates:
             - Path=/api/v1/flights/**
-      httpclient:
-        connect-timeout: 30000
-        response-timeout: 3s
 logging:
   level:
     root: warn
