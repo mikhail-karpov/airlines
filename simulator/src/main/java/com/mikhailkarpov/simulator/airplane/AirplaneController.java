@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
 @Slf4j
-@RestController
+@RestController("airplaneCommand")
 @RequestMapping("/api/v1/airplanes")
-public class AirplaneController {
+public class AirplaneController implements Function<AirplaneCommand, Airplane> {
 
     private final AirportService airportService;
     private final AirplaneService airplaneService;
@@ -30,6 +31,22 @@ public class AirplaneController {
         this.airportService = airportService;
         this.airplaneService = airplaneService;
         this.flightService = flightService;
+    }
+
+    @Override
+    public Airplane apply(AirplaneCommand command) {
+        log.debug("Received {}", command);
+
+        String flightCode = command.getFlightCode();
+        AirplaneCommandType commandType = command.getCommandType();
+
+        if (AirplaneCommandType.TAKE_OFF == commandType) {
+            return airplaneService.takeOff(flightCode);
+        } else if (AirplaneCommandType.LAND == commandType) {
+            return airplaneService.land(flightCode);
+        } else {
+            return airplaneService.fly(flightCode);
+        }
     }
 
     @PostMapping
@@ -44,7 +61,7 @@ public class AirplaneController {
         Flight flight = flightService.createFlight(origin.getCode(), destination.getCode());
         log.debug("Created: {}", flight);
 
-        if (flight.getStatus() == FlightStatus.SCHEDULED) {
+        if (flight.getStatus() == FlightStatus.CREATED) {
             Airplane airplane = airplaneService.createAirplane(flight.getCode(), origin.getLocation(), destination.getLocation());
             log.debug("Created: {}", airplane);
             return airplane;

@@ -7,10 +7,10 @@ import com.mikhailkarpov.flights.api.FlightStatus;
 import com.mikhailkarpov.flights.api.exceptions.FlightAlreadyExistsException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,20 +18,26 @@ import java.util.Optional;
 public class FlightServiceImpl implements FlightService {
 
     private final FlightRepository flightRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
-    public FlightServiceImpl(FlightRepository flightRepository,
-                             ApplicationEventPublisher eventPublisher) {
+    public FlightServiceImpl(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;
-        this.eventPublisher = eventPublisher;
     }
 
     @Override
     @Transactional
     public Flight createFlight(@NonNull CreateFlightRequest request) {
-        Flight flight = createAndSaveFlight(request);
-        eventPublisher.publishEvent(new FlightCreatedEvent(flight));
-        return flight;
+        if (flightRepository.existsByCode(request.getCode())) {
+            throw new FlightAlreadyExistsException(request.getCode());
+        }
+
+        FlightEntity flightEntity = flightRepository.save(FlightEntity.builder()
+                .code(request.getCode())
+                .origin(request.getOrigin())
+                .destination(request.getDestination())
+                .status(FlightStatus.CREATED)
+                .build());
+
+        return mapEntityToDto(flightEntity);
     }
 
     @Override
@@ -51,19 +57,11 @@ public class FlightServiceImpl implements FlightService {
         });
     }
 
-    private Flight createAndSaveFlight(CreateFlightRequest request) {
-        if (flightRepository.existsByCode(request.getCode())) {
-            throw new FlightAlreadyExistsException(request.getCode());
-        }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Flight> listFlights(@NonNull FlightStatus status) {
 
-        FlightEntity flightEntity = flightRepository.save(FlightEntity.builder()
-                .code(request.getCode())
-                .origin(request.getOrigin())
-                .destination(request.getDestination())
-                .status(FlightStatus.SCHEDULED)
-                .build());
-
-        return mapEntityToDto(flightEntity);
+        return flightRepository.findFlightsByStatus(status);
     }
 
     private static Flight mapEntityToDto(FlightEntity entity) {
