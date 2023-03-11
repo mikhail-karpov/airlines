@@ -34,3 +34,6 @@ logging:
     root: warn
     org.springframework.web: debug
     com.mikhailkarpov: info
+management:
+  endpoints:
+    web.exposure.include: info, health, prometheus

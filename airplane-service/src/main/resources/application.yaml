@@ -1,6 +1,6 @@
 spring:
   application:
-    name: simulator
+    name: airplane-service
   main:
     banner-mode: off
   cache:
@@ -43,3 +43,7 @@ logging:
   level:
     root: warn
     com.mikhailkarpov: debug
+
+management:
+  endpoints:
+    web.exposure.include: info, health, prometheus
